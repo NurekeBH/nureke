@@ -2,11 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
+/**
+ * ЕКІ ТАҚЫРЫП.
+ *
+ * Түстер осында, RGB арналары бөлек жазылады: Tailwind-қа `nur/40` деген
+ * мөлдірлік модификаторлары жұмыс істеуі үшін дәл осы пішім керек
+ * (tailwind.config.js ішінде `rgb(var(--c-nur) / <alpha-value>)`).
+ *
+ * ӘДЕПКІ — ҚАРАҢҒЫ. Жарық тақырып `[data-theme="light"]` арқылы қосылады.
+ * Реті әдейі осылай: JS өшірулі болса, сайт бұрынғыдай қараңғы күйінде
+ * қалады, ештеңе бұзылмайды.
+ *
+ * Тақырыпты кім таңдайды — src/app/layout.tsx ішіндегі inline скрипт
+ * (бет боялғанға дейін жүреді) және src/components/theme-toggle.tsx.
+ */
 :root {
-  /* Шрифт грузится системный — никакой внешней зависимости при сборке. */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
     'Noto Sans', Arial, sans-serif;
+
   color-scheme: dark;
+
+  --c-ink: 10 11 13;
+  --c-surface: 19 21 25;
+  --c-elevated: 26 29 35;
+  --c-line: 38 42 50;
+  --c-body: 232 234 237;
+  --c-muted: 155 161 170;
+
+  --c-nur: 255 176 32;
+  --c-nur-soft: 255 207 107;
+  --c-nur-deep: 240 124 27;
+
+  /* Түймедегі мәтін акцент фонының үстінде тұрады, сондықтан ол ӘРҚАШАН
+     фонның қарама-қарсысы болуы керек — `ink` емес. */
+  --c-on-nur: 10 11 13;
+
+  --shadow-fab: 0 0 0 / 0.45;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --c-ink: 251 250 249;
+  --c-surface: 255 255 255;
+  --c-elevated: 244 243 241;
+  --c-line: 228 225 220;
+  --c-body: 26 28 32;
+  --c-muted: 97 101 108;
+
+  /* Ашық фонда #FFB020 мәтін ретінде оқылмайды (контраст 1.9:1).
+     Сондықтан акцент қоюлатылды: #B45309 → 4.9:1, AA талабынан өтеді.
+     `soft` бұл жерде «ашығырақ» емес, «қоюырақ» дегенді білдіреді —
+     ол hover күйі, ал ашық фонда hover қоюлануы керек. */
+  --c-nur: 180 83 9;
+  --c-nur-soft: 146 64 14;
+  --c-nur-deep: 194 65 12;
+
+  --c-on-nur: 255 255 255;
+
+  --shadow-fab: 0 0 0 / 0.18;
 }
 
 html {
@@ -15,20 +69,31 @@ html {
 }
 
 body {
-  background-color: theme('colors.ink');
-  color: theme('colors.body');
+  background-color: rgb(var(--c-ink));
+  color: rgb(var(--c-body));
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
+/* Тақырып ауысқанда (07:00 / 19:00 немесе ауыстырғышпен) күрт секірмесін. */
+@media (prefers-reduced-motion: no-preference) {
+  body,
+  header,
+  .card,
+  .field,
+  .btn {
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+}
+
 ::selection {
-  background-color: theme('colors.nur.DEFAULT');
-  color: theme('colors.ink');
+  background-color: rgb(var(--c-nur));
+  color: rgb(var(--c-on-nur));
 }
 
 *:focus-visible {
-  outline: 2px solid theme('colors.nur.DEFAULT');
+  outline: 2px solid rgb(var(--c-nur));
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -44,7 +109,7 @@ body {
   }
 
   .btn-primary {
-    @apply btn bg-nur text-ink hover:bg-nur-soft;
+    @apply btn bg-nur text-on-nur hover:bg-nur-soft;
   }
 
   .btn-ghost {
@@ -83,6 +148,12 @@ body {
 
   .label {
     @apply mb-2 block text-sm font-medium text-muted;
+  }
+
+  /* Қалқымалы WhatsApp түймесі. Ашық тақырыпта қою көлеңке өрескел
+     көрінеді, сондықтан күші тақырыпқа қарай өзгереді. */
+  .shadow-fab {
+    box-shadow: 0 10px 30px -8px rgb(var(--shadow-fab));
   }
 }
 

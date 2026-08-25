@@ -4,6 +4,7 @@ import { SITE } from '@/content/site';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 import { StickyContact } from '@/components/sticky-contact';
+import { THEME_COLOR, themeBootstrapScript } from '@/lib/theme';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
@@ -30,7 +31,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0A0B0D',
+  // Браузердің мекенжай жолағының түсі. Мұнда билд кезіндегі бастапқы мән
+  // тұрады; тақырып ауысқанда оны theme-toggle.tsx жаңартып отырады.
+  themeColor: THEME_COLOR.dark,
   width: 'device-width',
   initialScale: 1,
 };
@@ -53,7 +56,19 @@ const organizationSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ru">
+    // suppressHydrationWarning — төмендегі скрипт <html>-ге data-theme қояды,
+    // ол React гидратациялағанға дейін болады. Онсыз React сәйкессіздік деп
+    // ескерту жазады. Айырма әдейі: тақырып клиентте ғана белгілі болады.
+    <html lang="ru" suppressHydrationWarning>
+      <head>
+        {/*
+          Тақырыпты бет боялғанға ДЕЙІН қоямыз. Бұл жай ыңғайлылық емес:
+          кешіктірсек, келуші алдымен қараңғы бетті көріп, содан кейін ол
+          жарыққа секіреді. Сондықтан бұл — бөлек файл емес, тікелей осында
+          тұрған кішкене скрипт (сыртқы файл жүктелгенше бет боялып үлгереді).
+        */}
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+      </head>
       <body className="min-h-screen antialiased">
         <script
           type="application/ld+json"
@@ -61,7 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-nur focus:px-4 focus:py-2 focus:text-ink"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-nur focus:px-4 focus:py-2 focus:text-on-nur"
         >
           К содержанию
         </a>

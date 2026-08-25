@@ -3,17 +3,20 @@ module.exports = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
+      // Нақты мәндер — src/app/globals.css ішінде, екі тақырып үшін бөлек.
+      // Мұнда тек сілтеме тұр. `<alpha-value>` болмаса `nur/40` жұмыс істемейді.
       colors: {
-        ink: '#0A0B0D',
-        surface: '#131519',
-        elevated: '#1A1D23',
-        line: '#262A32',
-        body: '#E8EAED',
-        muted: '#9BA1AA',
+        ink: 'rgb(var(--c-ink) / <alpha-value>)',
+        surface: 'rgb(var(--c-surface) / <alpha-value>)',
+        elevated: 'rgb(var(--c-elevated) / <alpha-value>)',
+        line: 'rgb(var(--c-line) / <alpha-value>)',
+        body: 'rgb(var(--c-body) / <alpha-value>)',
+        muted: 'rgb(var(--c-muted) / <alpha-value>)',
+        'on-nur': 'rgb(var(--c-on-nur) / <alpha-value>)',
         nur: {
-          DEFAULT: '#FFB020',
-          soft: '#FFCF6B',
-          deep: '#F07C1B',
+          DEFAULT: 'rgb(var(--c-nur) / <alpha-value>)',
+          soft: 'rgb(var(--c-nur-soft) / <alpha-value>)',
+          deep: 'rgb(var(--c-nur-deep) / <alpha-value>)',
         },
       },
       fontFamily: {

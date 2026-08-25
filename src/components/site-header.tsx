@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { NAV, SITE, whatsappLink } from '@/content/site';
+import { ThemeToggle } from './theme-toggle';
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -11,7 +12,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-line/70 bg-ink/90 backdrop-blur">
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <Link href="/" className="flex items-center gap-2 font-bold tracking-tight" onClick={() => setOpen(false)}>
-          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-nur shadow-[0_0_16px_4px_rgba(255,176,32,0.45)]" />
+          <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-nur shadow-[0_0_16px_4px_rgb(var(--c-nur)/0.45)]" />
           <span>{SITE.name}</span>
         </Link>
 
@@ -23,22 +24,29 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
-          <a className="btn-primary" href={whatsappLink('Здравствуйте! Хочу обсудить проект.')} target="_blank" rel="noopener noreferrer">
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+
+          <a
+            className="btn-primary hidden md:inline-flex"
+            href={whatsappLink('Здравствуйте! Хочу обсудить проект.')}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Обсудить проект
           </a>
-        </div>
 
-        <button
-          type="button"
-          className="btn-ghost px-3 md:hidden"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="sr-only">Меню</span>
-          <span aria-hidden>{open ? '✕' : '☰'}</span>
-        </button>
+          <button
+            type="button"
+            className="btn-ghost px-3 md:hidden"
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="sr-only">Меню</span>
+            <span aria-hidden>{open ? '✕' : '☰'}</span>
+          </button>
+        </div>
       </div>
 
       {open && (
