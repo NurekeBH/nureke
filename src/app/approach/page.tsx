@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Section } from '@/components/section';
 import { LeadForm } from '@/components/lead-form';
-import { HONEST_START, RISK_REVERSAL, WHY_US } from '@/content/trust';
+import { EXPERIENCE, RISK_REVERSAL, WHY_US } from '@/content/trust';
 import { PROCESS } from '@/content/site';
 import { PAYMENT_TERMS } from '@/content/pricing';
 
@@ -17,24 +17,31 @@ export const metadata: Metadata = {
 export default function ApproachPage() {
   return (
     <>
-      <Section eyebrow="Как мы работаем" title={HONEST_START.title} titleAs="h1">
+      <Section eyebrow="Как мы работаем" title={EXPERIENCE.headline} titleAs="h1">
         <div className="max-w-3xl space-y-4">
-          {HONEST_START.body.map((paragraph) => (
+          {EXPERIENCE.body.map((paragraph) => (
             <p key={paragraph} className="lede">
               {paragraph}
             </p>
           ))}
         </div>
-        <div className="card mt-8 max-w-3xl border-nur/40">
-          <p className="eyebrow">{HONEST_START.pilot.title}</p>
-          <p className="mt-3 text-lg leading-relaxed">{HONEST_START.pilot.body}</p>
-        </div>
+        <dl className="mt-8 grid max-w-3xl gap-4 sm:grid-cols-3">
+          {EXPERIENCE.facts.map((fact) => (
+            <div key={fact.label} className="card">
+              <dt className="sr-only">{fact.label}</dt>
+              <dd>
+                <span className="block text-xl font-bold text-nur">{fact.value}</span>
+                <span className="mt-1 block text-sm text-muted">{fact.label}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
       </Section>
 
       <Section
         eyebrow="Ваш риск"
         title="Шесть вещей, которые защищают вас, а не нас"
-        lede="Когда у студии нет публичного портфолио, единственный честный аргумент — сделать так, чтобы клиент мало терял, если сотрудничество не сложится."
+        lede="Опыт — это слова, пока вы его не увидели. Поэтому условия работы устроены так, чтобы вы рисковали минимально и могли остановиться в любой момент."
       >
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {RISK_REVERSAL.map((item) => (

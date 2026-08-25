@@ -5,7 +5,6 @@ import { Faq } from '@/components/faq';
 import { LeadForm } from '@/components/lead-form';
 import { DISCOVERY, PACKAGES, PAYMENT_TERMS } from '@/content/pricing';
 import { FAQ } from '@/content/site';
-import { HONEST_START } from '@/content/trust';
 
 export const revalidate = 3600;
 
@@ -74,16 +73,6 @@ export default function PricingPage() {
             ))}
           </ul>
           <p className="mt-6 border-t border-line pt-5 text-nur-soft">{DISCOVERY.guarantee}</p>
-        </div>
-      </Section>
-
-      <Section eyebrow="Запуск" title={HONEST_START.pilot.title}>
-        <div className="card max-w-3xl border-nur/40">
-          <p className="text-lg leading-relaxed">{HONEST_START.pilot.body}</p>
-          <p className="mt-4 text-sm text-muted">
-            Условие простое: после сдачи вы разрешаете опубликовать кейс и записываете короткий
-            отзыв. Коммерческие детали, которые вы попросите не раскрывать, в кейс не попадают.
-          </p>
         </div>
       </Section>
 

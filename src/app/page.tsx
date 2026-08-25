@@ -4,7 +4,7 @@ import { Faq } from '@/components/faq';
 import { LeadForm } from '@/components/lead-form';
 import { FAQ, PROBLEMS, PROCESS, SITE, TECH_STACK, whatsappLink } from '@/content/site';
 import { SERVICES } from '@/content/services';
-import { HONEST_START, RISK_REVERSAL, WHY_US } from '@/content/trust';
+import { EXPERIENCE, RISK_REVERSAL, WHY_US } from '@/content/trust';
 import { PACKAGES, DISCOVERY } from '@/content/pricing';
 
 export const revalidate = 3600;
@@ -19,7 +19,9 @@ export default function HomePage() {
           className="pointer-events-none absolute -top-40 left-1/2 h-[420px] w-[820px] -translate-x-1/2 rounded-full bg-nur/15 blur-[120px]"
         />
         <div className="container-page relative py-20 sm:py-28">
-          <p className="eyebrow animate-rise">Продуктовая студия · {SITE.city}</p>
+          <p className="eyebrow animate-rise">
+            Продуктовая студия · {SITE.city} · {EXPERIENCE.years} лет в разработке
+          </p>
           <h1 className="h1 mt-5 max-w-4xl animate-rise">
             Мы не делаем сайты. Мы собираем системы, которые{' '}
             <span className="text-nur">приносят деньги</span>.
@@ -105,19 +107,26 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* 5 — Честный старт: вместо портфолио — снятие риска */}
-      <Section eyebrow="Честно" title={HONEST_START.title}>
+      {/* 5 — Опыт: главный аргумент вместо портфолио, пока кейсы готовятся */}
+      <Section eyebrow="Опыт" title={EXPERIENCE.headline}>
         <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="space-y-4">
-            {HONEST_START.body.map((paragraph) => (
+            {EXPERIENCE.body.map((paragraph) => (
               <p key={paragraph} className="leading-relaxed text-muted">
                 {paragraph}
               </p>
             ))}
-            <div className="card border-nur/40">
-              <p className="eyebrow">{HONEST_START.pilot.title}</p>
-              <p className="mt-3 leading-relaxed">{HONEST_START.pilot.body}</p>
-            </div>
+            <dl className="grid gap-4 pt-2 sm:grid-cols-3">
+              {EXPERIENCE.facts.map((fact) => (
+                <div key={fact.label} className="card">
+                  <dt className="sr-only">{fact.label}</dt>
+                  <dd>
+                    <span className="block text-xl font-bold text-nur">{fact.value}</span>
+                    <span className="mt-1 block text-sm text-muted">{fact.label}</span>
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
 
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">

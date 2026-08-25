@@ -32,6 +32,6 @@
 ## Decisions
 | ADR | Тақырып | Status |
 |---|---|---|
-| [0001](decisions/0001-brand-name.md) | Бренд атауы | ⏳ OPEN |
+| [0001](decisions/0001-brand-name.md) | Бренд атауы: Nureke Systems | ✅ ACCEPTED |
 | [0002](decisions/0002-platform-architecture.md) | Платформа архитектурасы | ✅ ACCEPTED |
-| [0003](decisions/0003-no-portfolio-strategy.md) | Портфолиосыз старт стратегиясы | ✅ ACCEPTED |
+| [0003](decisions/0003-experience-led-positioning.md) | Тәжірибеге негізделген позициялау, портфолио саясаты | ✅ ACCEPTED |
