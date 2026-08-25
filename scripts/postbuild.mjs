@@ -25,7 +25,6 @@
 import { rm, access, readFile, writeFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseEnv } from 'node:util';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'out');
@@ -38,42 +37,32 @@ if (!(await exists(OUT))) {
 }
 
 /**
- * `.env` файлдарын Next-тің тәртібімен жүктейміз.
+ * Билд манифесті — `src/app/build-manifest/route.ts` жазады.
  *
- * Бұл МІНДЕТТІ. Next `.env`-ті өзі оқиды, ал жалаң Node оқымайды. Онсыз:
- * иесі `.env` ішіне `NEXT_PUBLIC_SHOW_DRAFT_CASES="true"` деп қояды →
- * Next кейс беттерін ШЫН мазмұнмен жасайды → бұл скрипт айнымалыны көрмей,
- * «кейс жоқ» деп сол беттерді үнсіз өшіреді. Тексерілген: дәл солай болатын.
+ * Скрипт TS файлдарды ТІКЕЛЕЙ оқымайды. Бұрын оқитын, бірақ ол тек Node 22-де
+ * жұмыс істейді (типті өзі алып тастайды): Node 20-да билд
+ * `ERR_UNKNOWN_FILE_EXTENSION` деп құлайтын. Енді шешімді қосымшаның өзі
+ * билд кезінде JSON-ға жазады да, мұнда жалаң Node оқиды.
+ *
+ * Қосымша ұтыс: `.env` файлдарын қолмен талдаудың қажеті жоқ — манифестті
+ * Next жазады, ал ол `.env`-ті өзі оқып қойған. Бұрын мұнда сол логика
+ * қайталанып тұрған, әрі ұмытылса үнсіз қате беретін.
  */
-for (const file of ['.env.production.local', '.env.local', '.env.production', '.env']) {
-  const path = join(ROOT, file);
-  if (!(await exists(path))) continue;
-  const parsed = parseEnv(await readFile(path, 'utf8'));
-  for (const [key, value] of Object.entries(parsed)) {
-    if (!(key in process.env)) process.env[key] = value;
-  }
+const MANIFEST = join(OUT, 'build-manifest');
+
+if (!(await exists(MANIFEST))) {
+  console.error('postbuild: out/build-manifest жоқ — src/app/build-manifest/route.ts өшіп қалған ба?');
+  process.exit(1);
 }
 
-// Импорт ЕНВ жүктелгеннен КЕЙІН: cases.ts айнымалыны модуль жүктелген сәтте оқиды.
-const { hasCases, getVisibleCases, getAllCases } = await import('../src/content/cases.ts');
-const { LOCALES } = await import('../src/lib/i18n.ts');
-
-// Сөздіктерді index.ts арқылы емес, ТІКЕЛЕЙ аламыз: index.ts кеңейтімсіз
-// импорт пен `@/` бүркеншігін қолданады, ал жалаң Node оларды танымайды
-// (бұл файлдарды тек Next жинайды). Мұнда әр файлдың жолы толық жазылған.
-const dictionaries = Object.fromEntries(
-  await Promise.all(
-    LOCALES.map(async (lang) => [lang, (await import(`../src/content/locales/${lang}.ts`))[lang]]),
-  ),
-);
-const getDictionary = (lang) => dictionaries[lang];
+const manifest = JSON.parse(await readFile(MANIFEST, 'utf8'));
+const LOCALES = manifest.locales;
 
 // ── 1. Кейс жоқ тілдерде /cases өшіріледі ───────────────────────────────────
 for (const lang of LOCALES) {
-  if (hasCases(lang)) {
-    console.log(
-      `postbuild: ${lang} — ${getVisibleCases(lang).length}/${getAllCases(lang).length} кейс көрінеді, /cases қалдырылды.`,
-    );
+  const cases = manifest.cases[lang];
+  if (cases.has) {
+    console.log(`postbuild: ${lang} — ${cases.visible}/${cases.total} кейс көрінеді, /cases қалдырылды.`);
     continue;
   }
 
@@ -98,10 +87,10 @@ const esc = (value) =>
   String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
 const blocks = LOCALES.map((lang) => {
-  const t = getDictionary(lang);
+  const t = manifest.notFound[lang];
   return `    <section lang="${lang}">
-      <h2>${esc(t.pages.notFound.title)}</h2>
-      <p><a href="/${lang}">${esc(t.pages.notFound.home)}</a> · <a href="/${lang}/services">${esc(t.pages.notFound.toServices)}</a></p>
+      <h2>${esc(t.title)}</h2>
+      <p><a href="/${lang}">${esc(t.home)}</a> · <a href="/${lang}/services">${esc(t.toServices)}</a></p>
     </section>`;
 }).join('\n');
 
@@ -144,3 +133,7 @@ ${blocks}
 
 await writeFile(join(OUT, '404.html'), html, 'utf8');
 console.log('postbuild: out/404.html жасалды (үш тілде).');
+
+// Манифест — ішкі билд деректері, серверге жүктелмеуі керек.
+await rm(MANIFEST, { force: true });
+console.log('postbuild: build-manifest өшірілді (серверге жүктелмейді).');

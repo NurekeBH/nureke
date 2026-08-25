@@ -2,10 +2,13 @@
   "name": "nureke",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build",
-    "postbuild": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/postbuild.mjs",
+    "postbuild": "node scripts/postbuild.mjs",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
