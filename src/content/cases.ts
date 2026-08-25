@@ -24,6 +24,8 @@
  *  4. `tech` — то, что реально использовалось.
  */
 
+import type { Locale } from '@/lib/i18n';
+
 export type CaseStudy = {
   slug: string;
   client: string;
@@ -44,7 +46,7 @@ export type CaseStudy = {
   draft?: boolean;
 };
 
-export const CASES: readonly CaseStudy[] = [
+const CASES_RU: readonly CaseStudy[] = [
   {
     slug: 'ai-assistent-stomatologiya',
     client: 'Сеть стоматологий',
@@ -212,15 +214,40 @@ export const CASES: readonly CaseStudy[] = [
  * Черновики показываем только в разработке — или если владелец сознательно
  * включил их флагом. По умолчанию клиент их не увидит.
  */
+/**
+ * Кейстер тілге тәуелді.
+ *
+ * Қазір үшеуі де ОРЫСША дайындама (`draft: true`) — олар прод ортада
+ * көрінбейді әрі `/cases` 404 қайтарады (ADR-0003). Сондықтан оларды үш
+ * тілге аудару — ешқашан көрінбейтін мәтінге жұмсалған уақыт.
+ *
+ * НАҚТЫ кейс шыққанда ол ӘР ТІЛДЕ жеке жазылуы керек: кейс — маркетингтік
+ * мәтін, сөзбе-сөз аударма оны әлсіретеді. `kk` мен `en` әдейі бос —
+ * сонда ол тілдерде `/cases` 404 қайтарады, жартылай орысша бет шықпайды.
+ */
+const CASES_BY_LOCALE: Record<Locale, readonly CaseStudy[]> = {
+  ru: CASES_RU,
+  kk: [],
+  en: [],
+};
+
+/** Прод ортада дайындамалар көрінбейді. */
 export const SHOW_DRAFTS =
   process.env.NEXT_PUBLIC_SHOW_DRAFT_CASES === 'true' || process.env.NODE_ENV === 'development';
 
-/** Кейсы, которые видит посетитель. */
-export const VISIBLE_CASES = CASES.filter((item) => SHOW_DRAFTS || !item.draft);
+export const getAllCases = (lang: Locale) => CASES_BY_LOCALE[lang];
 
-/** Кейсы для sitemap и индексации — черновики сюда не попадают никогда. */
-export const INDEXABLE_CASES = CASES.filter((item) => !item.draft);
+export const getVisibleCases = (lang: Locale) =>
+  CASES_BY_LOCALE[lang].filter((item) => SHOW_DRAFTS || !item.draft);
 
-export const hasCases = VISIBLE_CASES.length > 0;
+/** sitemap-қа тек жарияланғаны кіреді — дайындама ешқашан кірмейді. */
+export const getIndexableCases = (lang: Locale) =>
+  CASES_BY_LOCALE[lang].filter((item) => !item.draft);
 
-export const getCase = (slug: string) => VISIBLE_CASES.find((item) => item.slug === slug);
+export const hasCases = (lang: Locale) => getVisibleCases(lang).length > 0;
+
+export const getCase = (lang: Locale, slug: string) =>
+  getVisibleCases(lang).find((item) => item.slug === slug);
+
+/** Кем дегенде бір тілде көрінетін кейс бар ма — prune-скрипті үшін. */
+export const hasAnyCases = () => (['ru', 'kk', 'en'] as Locale[]).some(hasCases);

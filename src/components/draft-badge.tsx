@@ -1,15 +1,18 @@
+import { getDictionary } from '@/content';
+import type { Locale } from '@/lib/i18n';
+
 /**
- * Видимая пометка, что перед вами заготовка, а не реальный проект.
- * Показывается только если черновики принудительно включены — иначе
- * посетитель их вообще не видит. Скрытых «примеров» на сайте не бывает.
+ * Алдыңыздағы нәрсенің нақты жоба емес, дайындама екенін көрсететін белгі.
+ * Тек дайындамалар әдейі қосылғанда ғана шығады — әйтпесе келуші оларды
+ * мүлдем көрмейді. Сайтта «жасырын үлгі» деген күй болмайды.
  */
-export function DraftBadge({ className = '' }: { className?: string }) {
+export function DraftBadge({ lang, className = '' }: { lang: Locale; className?: string }) {
   return (
     <span
       className={`inline-flex items-center gap-2 rounded-full border border-nur-deep/60 bg-nur-deep/15 px-3 py-1 text-xs font-semibold text-nur-soft ${className}`}
     >
       <span aria-hidden>⚠</span>
-      ПРИМЕР — заготовка, не реальный проект
+      {getDictionary(lang).common.draftBadge}
     </span>
   );
 }

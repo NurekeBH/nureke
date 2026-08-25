@@ -11,12 +11,6 @@ import {
 
 const ORDER: readonly ThemePreference[] = ['auto', 'light', 'dark'];
 
-const LABEL: Record<ThemePreference, string> = {
-  auto: 'Тема: по времени суток. Нажмите, чтобы выбрать вручную',
-  light: 'Тема: светлая. Нажмите, чтобы переключить',
-  dark: 'Тема: тёмная. Нажмите, чтобы вернуть автоматическую',
-};
-
 const ICON: Record<ThemePreference, string> = { auto: '◐', light: '☀', dark: '☾' };
 
 /**
@@ -55,7 +49,7 @@ function applyTheme(theme: Theme) {
   document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLOR[theme]);
 }
 
-export function ThemeToggle() {
+export function ThemeToggle({ labels }: { labels: Record<ThemePreference, string> }) {
   const preference = useSyncExternalStore(subscribe, readPreference, readPreferenceOnServer);
 
   useEffect(() => {
@@ -91,8 +85,8 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={cycle}
-      title={LABEL[preference]}
-      aria-label={LABEL[preference]}
+      title={labels[preference]}
+      aria-label={labels[preference]}
       className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line
                  text-lg leading-none text-muted transition-colors
                  hover:border-nur hover:text-nur"

@@ -1,14 +1,23 @@
 import { ImageResponse } from 'next/og';
 import { SITE } from '@/content/site';
+import { getDictionary } from '@/content';
+import { isLocale, localeParams } from '@/lib/i18n';
 
 // Статикалық экспорт: сурет билд кезінде бір рет жасалады (ADR-0002b).
 export const dynamic = 'force-static';
 
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
-export const alt = `${SITE.name} — ${SITE.tagline}`;
+export const alt = SITE.name;
 
-export default function OpengraphImage() {
+export function generateStaticParams() {
+  return localeParams();
+}
+
+export default async function OpengraphImage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  const t = getDictionary(isLocale(lang) ? lang : 'ru');
+
   return new ImageResponse(
     (
       <div
@@ -44,18 +53,18 @@ export default function OpengraphImage() {
         </div>
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ fontSize: 68, color: '#E8EAED', fontWeight: 700, lineHeight: 1.15 }}>
-            Digital-системы,
+          <div style={{ fontSize: 60, color: '#E8EAED', fontWeight: 700, lineHeight: 1.15 }}>
+            {t.home.titleLead}
           </div>
-          <div style={{ fontSize: 68, color: '#FFB020', fontWeight: 700, lineHeight: 1.15 }}>
-            которые приносят деньги
+          <div style={{ fontSize: 60, color: '#FFB020', fontWeight: 700, lineHeight: 1.15 }}>
+            {`${t.home.titleAccent}${t.home.titleTail}`}
           </div>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
           <div style={{ width: 72, height: 5, background: '#FFB020' }} />
-          <div style={{ fontSize: 30, color: '#9BA1AA' }}>
-            15 лет опыта · Алматы · nureke.kz
+          <div style={{ fontSize: 28, color: '#9BA1AA' }}>
+            {`15 ${t.home.yearsSuffix} · ${t.site.city} · nureke.kz`}
           </div>
         </div>
       </div>

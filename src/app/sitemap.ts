@@ -1,34 +1,51 @@
 import type { MetadataRoute } from 'next';
 import { SITE } from '@/content/site';
-import { SERVICES } from '@/content/services';
-import { INDEXABLE_CASES } from '@/content/cases';
+import { getDictionary } from '@/content';
+import { getIndexableCases } from '@/content/cases';
+import { LOCALES, alternates, path } from '@/lib/i18n';
 
 // Статикалық экспорт: билд кезінде бір рет жасалады (ADR-0002b).
-// lastModified — билд уақыты, сайт қайта жиналғанда жаңарады.
 export const dynamic = 'force-static';
 
+/**
+ * Әр бет үш тілде де тұрады, әрі әрқайсысы `alternates` арқылы бір-біріне
+ * сілтейді — сонда іздеу жүйесі оларды бөлек сайт емес, бір беттің үш
+ * нұсқасы деп түсінеді.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
-  const staticRoutes = ['', '/services', '/approach', '/pricing', '/contact', ...(INDEXABLE_CASES.length > 0 ? ['/cases'] : [])].map((path) => ({
-    url: `${SITE.url}${path}`,
-    lastModified: now,
-    changeFrequency: 'weekly' as const,
-    priority: path === '' ? 1 : 0.8,
-  }));
+  const entries: MetadataRoute.Sitemap = [];
 
-  const serviceRoutes = SERVICES.map((service) => ({
-    url: `${SITE.url}/services/${service.slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.9,
-  }));
+  for (const lang of LOCALES) {
+    const t = getDictionary(lang);
 
-  const caseRoutes = INDEXABLE_CASES.map((item) => ({
-    url: `${SITE.url}/cases/${item.slug}`,
-    lastModified: now,
-    changeFrequency: 'monthly' as const,
-    priority: 0.7,
-  }));
+    const routes: { to: string; priority: number }[] = [
+      { to: '/', priority: 1 },
+      { to: '/services', priority: 0.9 },
+      { to: '/approach', priority: 0.8 },
+      { to: '/pricing', priority: 0.8 },
+      { to: '/contact', priority: 0.7 },
+      ...t.services.map((service) => ({ to: `/services/${service.slug}`, priority: 0.9 })),
+      // Дайындама кейстер sitemap-қа ЕШҚАШАН кірмейді (ADR-0003).
+      ...getIndexableCases(lang).map((item) => ({ to: `/cases/${item.slug}`, priority: 0.8 })),
+    ];
 
-  return [...staticRoutes, ...serviceRoutes, ...caseRoutes];
+    if (getIndexableCases(lang).length > 0) {
+      routes.push({ to: '/cases', priority: 0.8 });
+    }
+
+    for (const route of routes) {
+      entries.push({
+        url: `${SITE.url}${path(lang, route.to)}`,
+        priority: route.priority,
+        changeFrequency: 'monthly',
+        alternates: {
+          languages: Object.fromEntries(
+            Object.entries(alternates(route.to)).map(([code, href]) => [code, `${SITE.url}${href}`]),
+          ),
+        },
+      });
+    }
+  }
+
+  return entries;
 }

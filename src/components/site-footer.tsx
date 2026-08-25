@@ -1,8 +1,13 @@
 import Link from 'next/link';
-import { NAV, SITE, whatsappLink } from '@/content/site';
-import { SERVICES } from '@/content/services';
+import { SITE, whatsappLink } from '@/content/site';
+import { getDictionary, getNav } from '@/content';
+import { hasCases } from '@/content/cases';
+import { path, type Locale } from '@/lib/i18n';
 
-export function SiteFooter() {
+export function SiteFooter({ lang }: { lang: Locale }) {
+  const t = getDictionary(lang);
+  const nav = getNav(lang, hasCases(lang));
+
   return (
     <footer className="mt-24 border-t border-line bg-surface/40">
       <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
@@ -11,16 +16,18 @@ export function SiteFooter() {
             <span aria-hidden className="h-2.5 w-2.5 rounded-full bg-nur" />
             {SITE.name}
           </div>
-          <p className="mt-3 text-sm leading-relaxed text-muted">{SITE.tagline}</p>
-          <p className="mt-3 text-sm text-muted">{SITE.city}, Казахстан</p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{t.site.tagline}</p>
+          <p className="mt-3 text-sm text-muted">
+            {t.site.city}, {t.site.country}
+          </p>
         </div>
 
         <div>
-          <h2 className="text-sm font-semibold">Услуги</h2>
+          <h2 className="text-sm font-semibold">{t.nav.services}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            {SERVICES.map((service) => (
+            {t.services.map((service) => (
               <li key={service.slug}>
-                <Link href={`/services/${service.slug}`} className="hover:text-body">
+                <Link href={path(lang, `/services/${service.slug}`)} className="hover:text-body">
                   {service.navTitle}
                 </Link>
               </li>
@@ -28,21 +35,21 @@ export function SiteFooter() {
           </ul>
         </div>
 
-        <div>
-          <h2 className="text-sm font-semibold">Разделы</h2>
+        <nav aria-label={t.a11y.footerNav}>
+          <h2 className="text-sm font-semibold">{t.nav.approach}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted">
-            {NAV.map((item) => (
+            {nav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="hover:text-body">
+                <Link href={path(lang, item.href)} className="hover:text-body">
                   {item.label}
                 </Link>
               </li>
             ))}
           </ul>
-        </div>
+        </nav>
 
         <div>
-          <h2 className="text-sm font-semibold">Связаться</h2>
+          <h2 className="text-sm font-semibold">{t.nav.contact}</h2>
           <ul className="mt-3 space-y-2 text-sm text-muted">
             <li>
               <a className="hover:text-body" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
@@ -65,7 +72,7 @@ export function SiteFooter() {
 
       <div className="border-t border-line">
         <div className="container-page py-6 text-xs text-muted">
-          © {new Date().getFullYear()} {SITE.legalName}. Все права защищены.
+          © {new Date().getFullYear()} {SITE.legalName}
         </div>
       </div>
     </footer>

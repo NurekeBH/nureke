@@ -1,16 +1,24 @@
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { Section } from '@/components/section';
 import { Faq } from '@/components/faq';
 import { LeadForm } from '@/components/lead-form';
-import { FAQ, PROBLEMS, PROCESS, SITE, TECH_STACK, whatsappLink } from '@/content/site';
-import { SERVICES } from '@/content/services';
-import { EXPERIENCE, RISK_REVERSAL, WHY_US } from '@/content/trust';
-import { PACKAGES, DISCOVERY } from '@/content/pricing';
 import { ClientsStrip } from '@/components/clients-strip';
+import { TECH_STACK, whatsappLink } from '@/content/site';
+import { getDictionary } from '@/content';
+import { isLocale, localeParams, path } from '@/lib/i18n';
 
 export const revalidate = 3600;
 
-export default function HomePage() {
+export function generateStaticParams() {
+  return localeParams();
+}
+
+export default async function HomePage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  if (!isLocale(lang)) notFound();
+  const t = getDictionary(lang);
+
   return (
     <>
       {/* 1 — Hero */}
@@ -21,39 +29,34 @@ export default function HomePage() {
         />
         <div className="container-page relative py-20 sm:py-28">
           <p className="eyebrow animate-rise">
-            Продуктовая студия · {SITE.city} · {EXPERIENCE.years} лет в разработке
+            {t.home.eyebrow} · {t.site.city} · 15 {t.home.yearsSuffix}
           </p>
           <h1 className="h1 mt-5 max-w-4xl animate-rise">
-            Мы не делаем сайты. Мы собираем системы, которые{' '}
-            <span className="text-nur">приносят деньги</span>.
+            {t.home.titleLead} <span className="text-nur">{t.home.titleAccent}</span>
+            {t.home.titleTail}
           </h1>
-          <p className="lede mt-6 max-w-2xl animate-rise">
-            AI-ассистент, который отвечает клиентам за 5 секунд. Магазин внутри Telegram без
-            комиссии площадки. Мобильное приложение с рабочим backend. Запуск — от двух недель.
-          </p>
+          <p className="lede mt-6 max-w-2xl animate-rise">{t.home.lede}</p>
           <div className="mt-9 flex flex-col gap-3 sm:flex-row">
             <a
               className="btn-primary"
-              href={whatsappLink('Здравствуйте! Хочу обсудить проект.')}
+              href={whatsappLink(t.common.whatsappGreeting)}
               target="_blank"
               rel="noopener noreferrer"
             >
-              Обсудить проект
+              {t.common.discussProject}
             </a>
             <Link className="btn-ghost" href="#lead">
-              Оставить заявку на сайте
+              {t.common.leaveRequest}
             </Link>
           </div>
-          <p className="mt-5 text-sm text-muted">
-            Отвечаем в WhatsApp в течение двух часов. Без звонков-продаж.
-          </p>
+          <p className="mt-5 text-sm text-muted">{t.common.answerNote}</p>
         </div>
       </section>
 
-      {/* 2 — Trust bar */}
+      {/* 2 — Стек */}
       <div className="border-b border-line bg-surface/40">
         <div className="container-page flex flex-wrap items-center gap-x-7 gap-y-3 py-5">
-          <span className="text-xs uppercase tracking-widest text-muted">Работаем на</span>
+          <span className="text-xs uppercase tracking-widest text-muted">{t.common.workingOn}</span>
           {TECH_STACK.map((tech) => (
             <span key={tech} className="text-sm font-medium text-muted">
               {tech}
@@ -62,17 +65,12 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 2.5 — Клиенты */}
-      <ClientsStrip />
+      <ClientsStrip lang={lang} />
 
       {/* 3 — Проблема */}
-      <Section
-        eyebrow="Знакомо?"
-        title="Три ситуации, из-за которых бизнес теряет деньги каждый день"
-        lede="Если узнали хотя бы одну — задача решается технически, и обычно быстрее, чем кажется."
-      >
+      <Section eyebrow={t.home.problems.eyebrow} title={t.home.problems.title} lede={t.home.problems.lede}>
         <div className="grid gap-5 md:grid-cols-3">
-          {PROBLEMS.map((problem) => (
+          {t.problems.map((problem) => (
             <article key={problem.title} className="card">
               <h3 className="h3">{problem.title}</h3>
               <p className="mt-3 leading-relaxed text-muted">{problem.body}</p>
@@ -82,27 +80,23 @@ export default function HomePage() {
       </Section>
 
       {/* 4 — Услуги */}
-      <Section
-        eyebrow="Услуги"
-        title="Что мы делаем"
-        lede="Мы сознательно делаем только три вещи. Каждая из них решает конкретную задачу: не терять заявки, начать продавать онлайн, получить собственный продукт."
-      >
+      <Section eyebrow={t.home.services.eyebrow} title={t.home.services.title} lede={t.home.services.lede}>
         <div className="grid gap-5 md:grid-cols-3">
-          {SERVICES.map((service) => (
+          {t.services.map((service) => (
             <Link
               key={service.slug}
-              href={`/services/${service.slug}`}
+              href={path(lang, `/services/${service.slug}`)}
               className="card group flex flex-col transition-colors hover:border-nur"
             >
               <h3 className="h3 group-hover:text-nur">{service.navTitle}</h3>
               <p className="mt-3 flex-1 leading-relaxed text-muted">{service.promise}</p>
               <dl className="mt-6 flex items-end justify-between border-t border-line pt-4">
                 <div>
-                  <dt className="text-xs uppercase tracking-widest text-muted">Стоимость</dt>
+                  <dt className="text-xs uppercase tracking-widest text-muted">{t.common.price}</dt>
                   <dd className="mt-1 font-semibold text-nur">{service.priceFrom}</dd>
                 </div>
                 <div className="text-right">
-                  <dt className="text-xs uppercase tracking-widest text-muted">Срок</dt>
+                  <dt className="text-xs uppercase tracking-widest text-muted">{t.common.duration}</dt>
                   <dd className="mt-1 font-semibold">{service.duration}</dd>
                 </div>
               </dl>
@@ -111,17 +105,17 @@ export default function HomePage() {
         </div>
       </Section>
 
-      {/* 5 — Опыт: главный аргумент вместо портфолио, пока кейсы готовятся */}
-      <Section eyebrow="Опыт" title={EXPERIENCE.headline}>
+      {/* 5 — Опыт вместо портфолио, пока кейсы готовятся (ADR-0003) */}
+      <Section eyebrow={t.home.experience.eyebrow} title={t.experience.headline}>
         <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="space-y-4">
-            {EXPERIENCE.body.map((paragraph) => (
+            {t.experience.body.map((paragraph) => (
               <p key={paragraph} className="leading-relaxed text-muted">
                 {paragraph}
               </p>
             ))}
             <dl className="grid gap-4 pt-2 sm:grid-cols-3">
-              {EXPERIENCE.facts.map((fact) => (
+              {t.experience.facts.map((fact) => (
                 <div key={fact.label} className="card">
                   <dt className="sr-only">{fact.label}</dt>
                   <dd>
@@ -134,7 +128,7 @@ export default function HomePage() {
           </div>
 
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            {RISK_REVERSAL.slice(0, 4).map((item) => (
+            {t.riskReversal.slice(0, 4).map((item) => (
               <li key={item.title} className="card">
                 <h3 className="h3">{item.title}</h3>
                 <p className="mt-2 leading-relaxed text-muted">{item.body}</p>
@@ -144,16 +138,16 @@ export default function HomePage() {
         </div>
 
         <div className="mt-8">
-          <Link className="btn-ghost" href="/approach">
-            Подробнее о том, как мы работаем
+          <Link className="btn-ghost" href={path(lang, '/approach')}>
+            {t.home.experience.more}
           </Link>
         </div>
       </Section>
 
       {/* 6 — Процесс */}
-      <Section eyebrow="Процесс" title="Как идёт работа" lede="Никаких «мы вам позвоним через месяц». Каждый этап заканчивается тем, что можно открыть и проверить.">
+      <Section eyebrow={t.home.process.eyebrow} title={t.home.process.title} lede={t.home.process.lede}>
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {PROCESS.map((step) => (
+          {t.process.map((step) => (
             <li key={step.step} className="card">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-bold text-nur">{step.step}</span>
@@ -167,9 +161,9 @@ export default function HomePage() {
       </Section>
 
       {/* 7 — Почему мы */}
-      <Section eyebrow="Почему мы" title="Четыре причины, которые можно проверить">
+      <Section eyebrow={t.home.whyUs.eyebrow} title={t.home.whyUs.title}>
         <div className="grid gap-5 sm:grid-cols-2">
-          {WHY_US.map((item) => (
+          {t.whyUs.map((item) => (
             <article key={item.title} className="card">
               <h3 className="h3">{item.title}</h3>
               <p className="mt-3 leading-relaxed text-muted">{item.body}</p>
@@ -179,22 +173,20 @@ export default function HomePage() {
       </Section>
 
       {/* 8 — Пакеты */}
-      <Section
-        eyebrow="Стоимость"
-        title="С чего начинают клиенты"
-        lede="Это ориентиры. Точная цена — после Discovery, когда понятен объём."
-      >
+      <Section eyebrow={t.home.pricing.eyebrow} title={t.home.pricing.title} lede={t.home.pricing.lede}>
         <div className="grid gap-5 lg:grid-cols-3">
-          {PACKAGES.map((pkg) => (
+          {t.packages.map((pkg) => (
             <article
               key={pkg.name}
               className={`card flex flex-col ${pkg.featured ? 'border-nur/60 ring-1 ring-nur/30' : ''}`}
             >
-              {pkg.featured && <p className="eyebrow">Чаще всего выбирают</p>}
+              {pkg.featured && <p className="eyebrow">{t.common.mostChosen}</p>}
               <h3 className="h3 mt-1">{pkg.name}</h3>
               <p className="mt-1 text-sm text-muted">{pkg.for}</p>
               <p className="mt-5 text-2xl font-bold text-nur">{pkg.price}</p>
-              <p className="mt-1 text-sm text-muted">Запуск: {pkg.duration}</p>
+              <p className="mt-1 text-sm text-muted">
+                {t.common.launch}: {pkg.duration}
+              </p>
               <ul className="mt-5 flex-1 space-y-2 text-sm text-muted">
                 {pkg.items.map((item) => (
                   <li key={item} className="flex gap-2">
@@ -206,10 +198,10 @@ export default function HomePage() {
                 ))}
               </ul>
               <p className="mt-5 border-t border-line pt-4 text-sm text-muted">
-                Поддержка: {pkg.support}
+                {t.common.support}: {pkg.support}
               </p>
-              <Link className="btn-ghost mt-4" href={pkg.href}>
-                Подробнее
+              <Link className="btn-ghost mt-4" href={path(lang, `/services/${pkg.slug}`)}>
+                {t.common.more}
               </Link>
             </article>
           ))}
@@ -218,55 +210,42 @@ export default function HomePage() {
         <div className="card mt-5 border-nur/40">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="max-w-2xl">
-              <p className="eyebrow">Если ещё не решили</p>
+              <p className="eyebrow">{t.home.pricing.ifUndecided}</p>
               <h3 className="h3 mt-2">
-                {DISCOVERY.name} — {DISCOVERY.price} за {DISCOVERY.duration}
+                {t.discovery.name} — {t.discovery.price} / {t.discovery.duration}
               </h3>
-              <p className="mt-3 leading-relaxed text-muted">{DISCOVERY.pitch}</p>
-              <p className="mt-3 text-sm text-nur-soft">{DISCOVERY.guarantee}</p>
+              <p className="mt-3 leading-relaxed text-muted">{t.discovery.pitch}</p>
+              <p className="mt-3 text-sm text-nur-soft">{t.discovery.guarantee}</p>
             </div>
-            <Link className="btn-primary shrink-0" href="/pricing">
-              Что входит
+            <Link className="btn-primary shrink-0" href={path(lang, '/pricing')}>
+              {t.common.whatIncluded}
             </Link>
           </div>
         </div>
       </Section>
 
       {/* 9 — FAQ */}
-      <Section eyebrow="Вопросы" title="Отвечаем заранее">
-        <Faq items={FAQ} />
+      <Section eyebrow={t.home.faq.eyebrow} title={t.home.faq.title}>
+        <Faq items={t.faq} />
       </Section>
 
       {/* 10 — Форма */}
-      <Section id="lead" eyebrow="Начнём" title="Расскажите про задачу">
+      <Section id="lead" eyebrow={t.home.lead.eyebrow} title={t.home.lead.title}>
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
           <div>
-            <p className="lede">
-              Опишите ситуацию своими словами — этого достаточно. Мы вернёмся с вопросами и
-              скажем честно, можем ли помочь и сколько это примерно стоит.
-            </p>
+            <p className="lede">{t.home.lead.lede}</p>
             <ul className="mt-7 space-y-4 text-muted">
-              <li className="flex gap-3">
-                <span aria-hidden className="text-nur">
-                  1
-                </span>
-                <span>Отвечаем в WhatsApp в течение двух часов в рабочее время.</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="text-nur">
-                  2
-                </span>
-                <span>Задаём вопросы про бизнес, а не про количество страниц.</span>
-              </li>
-              <li className="flex gap-3">
-                <span aria-hidden className="text-nur">
-                  3
-                </span>
-                <span>Если задача не наша — скажем прямо и подскажем, к кому идти.</span>
-              </li>
+              {t.home.lead.points.map((point, index) => (
+                <li key={point} className="flex gap-3">
+                  <span aria-hidden className="text-nur">
+                    {index + 1}
+                  </span>
+                  <span>{point}</span>
+                </li>
+              ))}
             </ul>
           </div>
-          <LeadForm />
+          <LeadForm lang={lang} />
         </div>
       </Section>
     </>

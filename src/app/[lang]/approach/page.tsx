@@ -1,32 +1,49 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { Section } from '@/components/section';
 import { LeadForm } from '@/components/lead-form';
-import { EXPERIENCE, RISK_REVERSAL, WHY_US } from '@/content/trust';
-import { PROCESS } from '@/content/site';
-import { PAYMENT_TERMS } from '@/content/pricing';
+import { getDictionary } from '@/content';
+import { alternates, isLocale, localeParams, path } from '@/lib/i18n';
 
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  title: 'Как мы работаем — этапы, оплата и гарантии',
-  description:
-    'Оплата по этапам, рабочая сборка каждую неделю, фиксированная смета, передача исходного кода и 30 дней бесплатных исправлений. Как устроена работа над проектом.',
-  alternates: { canonical: '/approach' },
-};
+export function generateStaticParams() {
+  return localeParams();
+}
 
-export default function ApproachPage() {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  if (!isLocale(lang)) return {};
+  const t = getDictionary(lang).pages.approach;
+  return {
+    title: t.seoTitle,
+    description: t.seoDescription,
+    alternates: { canonical: path(lang, '/approach'), languages: alternates('/approach') },
+  };
+}
+
+export default async function ApproachPage({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  if (!isLocale(lang)) notFound();
+  const t = getDictionary(lang);
+  const p = t.pages.approach;
+
   return (
     <>
-      <Section eyebrow="Как мы работаем" title={EXPERIENCE.headline} titleAs="h1">
+      <Section eyebrow={p.eyebrow} title={t.experience.headline} titleAs="h1">
         <div className="max-w-3xl space-y-4">
-          {EXPERIENCE.body.map((paragraph) => (
+          {t.experience.body.map((paragraph) => (
             <p key={paragraph} className="lede">
               {paragraph}
             </p>
           ))}
         </div>
         <dl className="mt-8 grid max-w-3xl gap-4 sm:grid-cols-3">
-          {EXPERIENCE.facts.map((fact) => (
+          {t.experience.facts.map((fact) => (
             <div key={fact.label} className="card">
               <dt className="sr-only">{fact.label}</dt>
               <dd>
@@ -38,13 +55,9 @@ export default function ApproachPage() {
         </dl>
       </Section>
 
-      <Section
-        eyebrow="Ваш риск"
-        title="Шесть вещей, которые защищают вас, а не нас"
-        lede="Опыт — это слова, пока вы его не увидели. Поэтому условия работы устроены так, чтобы вы рисковали минимально и могли остановиться в любой момент."
-      >
+      <Section eyebrow={p.risk.eyebrow} title={p.risk.title} lede={p.risk.lede}>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {RISK_REVERSAL.map((item) => (
+          {t.riskReversal.map((item) => (
             <article key={item.title} className="card">
               <h3 className="h3">{item.title}</h3>
               <p className="mt-3 leading-relaxed text-muted">{item.body}</p>
@@ -53,9 +66,9 @@ export default function ApproachPage() {
         </div>
       </Section>
 
-      <Section eyebrow="Этапы" title="Как идёт проект">
+      <Section eyebrow={p.stages.eyebrow} title={p.stages.title}>
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {PROCESS.map((step) => (
+          {t.process.map((step) => (
             <li key={step.step} className="card">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm font-bold text-nur">{step.step}</span>
@@ -68,9 +81,9 @@ export default function ApproachPage() {
         </ol>
       </Section>
 
-      <Section eyebrow="Оплата" title="Как распределяются платежи">
+      <Section eyebrow={p.payment.eyebrow} title={p.payment.title}>
         <div className="grid gap-5 md:grid-cols-3">
-          {PAYMENT_TERMS.map((term) => (
+          {t.paymentTerms.map((term) => (
             <div key={term.scope} className="card">
               <h3 className="h3">{term.scope}</h3>
               <p className="mt-3 leading-relaxed text-muted">{term.schedule}</p>
@@ -79,9 +92,9 @@ export default function ApproachPage() {
         </div>
       </Section>
 
-      <Section eyebrow="Отличия" title="Чем мы отличаемся от студии из поиска">
+      <Section eyebrow={p.difference.eyebrow} title={p.difference.title}>
         <div className="grid gap-5 sm:grid-cols-2">
-          {WHY_US.map((item) => (
+          {t.whyUs.map((item) => (
             <article key={item.title} className="card">
               <h3 className="h3">{item.title}</h3>
               <p className="mt-3 leading-relaxed text-muted">{item.body}</p>
@@ -90,13 +103,10 @@ export default function ApproachPage() {
         </div>
       </Section>
 
-      <Section id="lead" eyebrow="Следующий шаг" title="Разберём вашу задачу">
+      <Section id="lead" eyebrow={p.next.eyebrow} title={p.next.title}>
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
-          <p className="lede">
-            Созвон на 25 минут: вы рассказываете, что происходит сейчас, мы задаём вопросы и
-            говорим честно, можем ли помочь. Если задача не наша — скажем сразу.
-          </p>
-          <LeadForm />
+          <p className="lede">{p.nextLede}</p>
+          <LeadForm lang={lang} />
         </div>
       </Section>
     </>

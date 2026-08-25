@@ -3,55 +3,72 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Section } from '@/components/section';
 import { LeadForm } from '@/components/lead-form';
-import { CASES, getCase } from '@/content/cases';
 import { DraftBadge } from '@/components/draft-badge';
+import { getDictionary } from '@/content';
+import { getAllCases, getCase } from '@/content/cases';
+import { LOCALES, alternates, isLocale, path } from '@/lib/i18n';
 
 export const revalidate = 3600;
 
 // Статикалық экспорт: тек осы тізімдегі slug-тар бар, қалғаны 404.
-// Барлық кейс draft болса тізім бос болады — бет мүлдем жасалмайды (ADR-0003).
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  // Барлық slug-ты береміз, бірақ бұл «бәрі жарияланады» дегенді БІЛДІРМЕЙДІ:
-  // төмендегі getCase() тек VISIBLE_CASES ішінен іздейді, сондықтан заготовка
-  // notFound() арқылы сүзіліп қалады да, беті мүлдем жасалмайды (ADR-0003).
-  // Себебі: статикалық экспорт бос тізімді қабылдамайды.
-  return CASES.map((item) => ({ slug: item.slug }));
+  // Барлық slug беріледі, бірақ бұл «бәрі жарияланады» дегенді БІЛДІРМЕЙДІ:
+  // төмендегі getCase() тек көрінетіндердің ішінен іздейді, сондықтан
+  // дайындама notFound() арқылы сүзіліп қалады (ADR-0003).
+  // Кейс жоқ тілде тізім бос — ол тілде бет мүлдем жасалмайды.
+  return LOCALES.flatMap((lang) => getAllCases(lang).map((item) => ({ lang, slug: item.slug })));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
-  const study = getCase(slug);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: string; slug: string }>;
+}): Promise<Metadata> {
+  const { lang, slug } = await params;
+  if (!isLocale(lang)) return {};
+  const study = getCase(lang, slug);
   if (!study) return {};
   return {
     title: study.seoTitle,
     description: study.seoDescription,
-    alternates: { canonical: `/cases/${study.slug}` },
+    alternates: {
+      canonical: path(lang, `/cases/${study.slug}`),
+      languages: alternates(`/cases/${study.slug}`),
+    },
     openGraph: { title: study.seoTitle, description: study.seoDescription },
-    // Заготовку поисковики не увидят даже если она включена на сайте.
+    // Дайындаманы іздеу жүйесі сайтта қосулы тұрса да көрмейді.
     robots: study.draft ? { index: false, follow: false } : undefined,
   };
 }
 
-export default async function CasePage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const study = getCase(slug);
+export default async function CasePage({
+  params,
+}: {
+  params: Promise<{ lang: string; slug: string }>;
+}) {
+  const { lang, slug } = await params;
+  if (!isLocale(lang)) notFound();
+  const study = getCase(lang, slug);
   if (!study) notFound();
+
+  const t = getDictionary(lang);
+  const c = t.pages.cases;
 
   return (
     <>
       <section className="border-b border-line">
         <div className="container-page py-16 sm:py-20">
-          <nav aria-label="Хлебные крошки" className="text-sm text-muted">
-            <Link href="/cases" className="hover:text-body">
-              Кейсы
+          <nav aria-label={t.a11y.breadcrumbs} className="text-sm text-muted">
+            <Link href={path(lang, '/cases')} className="hover:text-body">
+              {c.eyebrow}
             </Link>
             <span aria-hidden> / </span>
             <span className="text-body">{study.client}</span>
           </nav>
 
-          {study.draft && <DraftBadge className="mt-6" />}
+          {study.draft && <DraftBadge lang={lang} className="mt-6" />}
 
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
             <span className="rounded-full border border-nur/50 px-3 py-1 font-semibold text-nur">
@@ -67,7 +84,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
       </section>
 
       {study.results.length > 0 && (
-        <Section eyebrow="Результат" title="Что изменилось">
+        <Section eyebrow={c.result} title={c.whatChanged}>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {study.results.map((item) => (
               <div key={item.label} className="card">
@@ -79,7 +96,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         </Section>
       )}
 
-      <Section eyebrow="Задача" title="Что нужно было решить">
+      <Section eyebrow={c.task} title={c.whatToSolve}>
         <ul className="grid gap-4 sm:grid-cols-2">
           {study.problem.map((item) => (
             <li key={item} className="card leading-relaxed text-muted">
@@ -89,7 +106,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         </ul>
       </Section>
 
-      <Section eyebrow="Решение" title="Что сделали">
+      <Section eyebrow={c.solution} title={c.whatWeDid}>
         <div className="grid gap-5 lg:grid-cols-2">
           {study.solution.map((item) => (
             <article key={item.title} className="card">
@@ -100,7 +117,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         </div>
       </Section>
 
-      <Section eyebrow="Стек" title="На чём это работает">
+      <Section eyebrow={c.stack} title={c.whatItRunsOn}>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {study.tech.map((group) => (
             <div key={group.group} className="card">
@@ -115,11 +132,13 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
             </div>
           ))}
         </div>
-        <p className="mt-5 text-sm text-muted">Сроки: {study.timeline}</p>
+        <p className="mt-5 text-sm text-muted">
+          {c.timeline}: {study.timeline}
+        </p>
       </Section>
 
       {study.testimonial && (
-        <Section eyebrow="Отзыв" title="Что говорит клиент">
+        <Section eyebrow={c.testimonial} title={c.whatClientSays}>
           <blockquote className="card border-nur/40">
             <p className="text-lg leading-relaxed">«{study.testimonial.quote}»</p>
             <footer className="mt-5 border-t border-line pt-4 text-sm text-muted">
@@ -129,13 +148,10 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
         </Section>
       )}
 
-      <Section id="lead" eyebrow="Похожая задача?" title="Расскажите, что нужно вам">
+      <Section id="lead" eyebrow={c.similarTask} title={c.tellUs}>
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
-          <p className="lede">
-            Опишите ситуацию своими словами. Вернёмся с вопросами и скажем честно, можем ли
-            помочь и сколько это примерно стоит.
-          </p>
-          <LeadForm />
+          <p className="lede">{c.similarLede}</p>
+          <LeadForm lang={lang} />
         </div>
       </Section>
     </>
