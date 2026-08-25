@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Build output
+dist/
+build/
+.next/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Flutter
+.dart_tool/
+.packages
+build/
+*.flutter-plugins
+*.flutter-plugins-dependencies
+
+# Docker
+volumes/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Coverage
+coverage/
+
+# Generated Prisma
+generated/
+
+# TypeScript build cache
+*.tsbuildinfo
+next-env.d.ts
