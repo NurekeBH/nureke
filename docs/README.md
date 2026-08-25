@@ -34,4 +34,5 @@
 |---|---|---|
 | [0001](decisions/0001-brand-name.md) | Бренд атауы: Nureke Systems | ✅ ACCEPTED |
 | [0002](decisions/0002-platform-architecture.md) | Платформа архитектурасы | ✅ ACCEPTED |
+| [0002b](decisions/0002b-static-export-on-shared-hosting.md) | Статикалық экспорт + PHP endpoint (ортақ хостинг) | ✅ ACCEPTED |
 | [0003](decisions/0003-experience-led-positioning.md) | Тәжірибеге негізделген позициялау, портфолио саясаты | ✅ ACCEPTED |

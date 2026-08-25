@@ -7,6 +7,14 @@
 Options -Indexes
 DirectoryIndex index.html
 
+# mod_dir «папка бар, слэш қой» деп 301 беріп, mod_rewrite-қа дейін үлгереді.
+# Next әр бетке аттас папка жасайтындықтан (төмендегі ⚠️ ескертпені қара),
+# бұл /services → /services/ → 403 тізбегін тудырады. Өшіреміз: слэш қою
+# қажет емес, себебі бізде әр «папканың» жанында дайын .html тұр.
+# Қауіпсіздігі: папка мазмұны ашылып кетпейді — жоғарыдағы `Options -Indexes`
+# ұстап тұр (Apache құжаттамасы дәл осы қосарлануды талап етеді).
+DirectorySlash Off
+
 # ── HTTPS ───────────────────────────────────────────────────────────────────
 <IfModule mod_rewrite.c>
   RewriteEngine On
@@ -16,14 +24,24 @@ DirectoryIndex index.html
   RewriteCond %{HTTP:X-Forwarded-Proto} !=https
   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+  # ⚠️ Next әр маршрутқа ЕКІ нәрсе жасайды: `approach.html` файлы ЖӘНЕ
+  # аттас `approach/` папкасы (ішінде RSC-жүктемелері, .txt).
+  # Сондықтан төмендегі екі ережеде де «папка ма?» (`!-d`) деген шарт
+  # ҚОЛДАНЫЛМАЙДЫ: ол әр бетте сәйкес келіп, ережені өшіріп тастайды.
+  # Салдары нақты болатын: /services → mod_dir 301 → /services/ → ішінде
+  # index.html жоқ → `Options -Indexes` → 403. Яғни басты беттен басқа
+  # ӘР БЕТ 403 қайтаратын. Оның орнына «.html сіңлісі бар ма?» деп сұраймыз.
+
   # Соңындағы слэшті алып тастаймыз: sitemap мен canonical слэшсіз жазылған,
   # екі URL бір бетті бермеуі керек (дубль контент).
-  RewriteCond %{REQUEST_FILENAME} !-d
+  # `.html` сіңлісі бар жағдайда ғана — әйтпесе /_next/ сияқты шын папкалар
+  # слэшсіз түрге кетіп, mod_dir оларды кері қайтарып, цикл шығар еді.
+  RewriteCond %{REQUEST_URI} ^/(.+)/$
+  RewriteCond %{DOCUMENT_ROOT}/%1.html -f
   RewriteRule ^(.+)/$ /$1 [L,R=301]
 
   # Таза URL: /services → /services.html (файл шынымен бар болса ғана).
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}.html -f
   RewriteRule ^(.*)$ /$1.html [L]
 </IfModule>
