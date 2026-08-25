@@ -4,7 +4,7 @@ import { Section } from '@/components/section';
 import { Faq } from '@/components/faq';
 import { LeadForm } from '@/components/lead-form';
 import { ClientsStrip } from '@/components/clients-strip';
-import { TECH_STACK, whatsappLink } from '@/content/site';
+import { whatsappLink } from '@/content/site';
 import { getDictionary } from '@/content';
 import { isLocale, localeParams, path } from '@/lib/i18n';
 
@@ -53,21 +53,9 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </section>
 
-      {/* 2 — Стек */}
-      <div className="border-b border-line bg-surface/40">
-        <div className="container-page flex flex-wrap items-center gap-x-7 gap-y-3 py-5">
-          <span className="text-xs uppercase tracking-widest text-muted">{t.common.workingOn}</span>
-          {TECH_STACK.map((tech) => (
-            <span key={tech} className="text-sm font-medium text-muted">
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
-
       <ClientsStrip lang={lang} />
 
-      {/* 3 — Проблема */}
+      {/* 2 — Проблема */}
       <Section eyebrow={t.home.problems.eyebrow} title={t.home.problems.title} lede={t.home.problems.lede}>
         <div className="grid gap-5 md:grid-cols-3">
           {t.problems.map((problem) => (
@@ -79,7 +67,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </Section>
 
-      {/* 4 — Услуги */}
+      {/* 3 — Услуги */}
       <Section eyebrow={t.home.services.eyebrow} title={t.home.services.title} lede={t.home.services.lede}>
         <div className="grid gap-5 md:grid-cols-3">
           {t.services.map((service) => (
@@ -105,7 +93,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </Section>
 
-      {/* 5 — Опыт вместо портфолио, пока кейсы готовятся (ADR-0003) */}
+      {/* 4 — Опыт вместо портфолио, пока кейсы готовятся (ADR-0003) */}
       <Section eyebrow={t.home.experience.eyebrow} title={t.experience.headline}>
         <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="space-y-4">
@@ -144,7 +132,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </Section>
 
-      {/* 6 — Процесс */}
+      {/* 5 — Процесс */}
       <Section eyebrow={t.home.process.eyebrow} title={t.home.process.title} lede={t.home.process.lede}>
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {t.process.map((step) => (
@@ -160,7 +148,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </ol>
       </Section>
 
-      {/* 7 — Почему мы */}
+      {/* 6 — Почему мы */}
       <Section eyebrow={t.home.whyUs.eyebrow} title={t.home.whyUs.title}>
         <div className="grid gap-5 sm:grid-cols-2">
           {t.whyUs.map((item) => (
@@ -172,7 +160,7 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </Section>
 
-      {/* 8 — Пакеты */}
+      {/* 7 — Пакеты */}
       <Section eyebrow={t.home.pricing.eyebrow} title={t.home.pricing.title} lede={t.home.pricing.lede}>
         <div className="grid gap-5 lg:grid-cols-3">
           {t.packages.map((pkg) => (
@@ -224,12 +212,12 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
         </div>
       </Section>
 
-      {/* 9 — FAQ */}
+      {/* 8 — FAQ */}
       <Section eyebrow={t.home.faq.eyebrow} title={t.home.faq.title}>
         <Faq items={t.faq} />
       </Section>
 
-      {/* 10 — Форма */}
+      {/* 9 — Форма */}
       <Section id="lead" eyebrow={t.home.lead.eyebrow} title={t.home.lead.title}>
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
           <div>

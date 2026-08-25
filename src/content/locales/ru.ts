@@ -61,7 +61,6 @@ export const ru = {
     launch: 'Запуск',
     support: 'Поддержка',
     mostChosen: 'Чаще всего выбирают',
-    workingOn: 'Работаем на',
     answerNote: 'Отвечаем в WhatsApp в течение двух часов. Без звонков-продаж.',
     draftBadge: 'ПРИМЕР — заготовка, не реальный проект',
     writeWhatsapp: 'Написать в WhatsApp',

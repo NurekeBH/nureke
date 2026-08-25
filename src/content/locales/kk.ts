@@ -61,7 +61,6 @@ export const kk: Dictionary = {
     launch: 'Іске қосу',
     support: 'Қолдау',
     mostChosen: 'Ең жиі таңдалады',
-    workingOn: 'Жұмыс істейміз',
     answerNote: 'WhatsApp-та екі сағат ішінде жауап береміз. Сату қоңырауларысыз.',
     draftBadge: 'ҮЛГІ — дайындама, нақты жоба емес',
     writeWhatsapp: 'WhatsApp-қа жазу',

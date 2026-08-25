@@ -16,16 +16,3 @@ export const SITE = {
 
 export const whatsappLink = (text?: string) =>
   `https://wa.me/${SITE.whatsapp}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
-
-/** Технология атаулары аударылмайды. */
-export const TECH_STACK = [
-  'Flutter',
-  'NestJS',
-  'Next.js',
-  'PostgreSQL',
-  'Prisma',
-  'Redis',
-  'Telegram API',
-  'Claude API',
-  'Docker',
-] as const;

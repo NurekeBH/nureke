@@ -61,7 +61,6 @@ export const en: Dictionary = {
     launch: 'Launch',
     support: 'Support',
     mostChosen: 'Most popular',
-    workingOn: 'Built with',
     answerNote: 'We reply on WhatsApp within two hours. No sales calls.',
     draftBadge: 'SAMPLE — placeholder, not a real project',
     writeWhatsapp: 'Message on WhatsApp',
