@@ -1,0 +1,88 @@
+# Nureke — Apache конфигурациясы статикалық экспорт үшін (ADR-0002b).
+#
+# `next.config.ts` ішіндегі headers() статикалық режимде жұмыс істемейді,
+# сондықтан қауіпсіздік хедерлері осында тұр. Біреуін өзгертсең — екеуін де
+# емес, ТЕК осы файлды өзгерт: бұл жерде жалғыз көзі.
+
+Options -Indexes
+DirectoryIndex index.html
+
+# ── HTTPS ───────────────────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Панельдегі SSL/TLS сертификаты қосылғаннан КЕЙІН ғана мағынасы бар.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # Соңындағы слэшті алып тастаймыз: sitemap мен canonical слэшсіз жазылған,
+  # екі URL бір бетті бермеуі керек (дубль контент).
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.+)/$ /$1 [L,R=301]
+
+  # Таза URL: /services → /services.html (файл шынымен бар болса ғана).
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI}.html -f
+  RewriteRule ^(.*)$ /$1.html [L]
+</IfModule>
+
+ErrorDocument 404 /404.html
+
+# ── Қауіпсіздік хедерлері ───────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+
+  # Сервер қандай екенін жарнамалаудың қажеті жоқ.
+  Header unset X-Powered-By
+  Header always unset X-Powered-By
+</IfModule>
+
+# ── Құпияларды жабу ─────────────────────────────────────────────────────────
+# config.php ішінде Telegram токені тұр — оны сырттан ешкім оқымауы керек.
+<Files "config.php">
+  Require all denied
+</Files>
+<Files "config.example.php">
+  Require all denied
+</Files>
+
+# Егер қойма қателесіп public_html ішінде жасалып қалса — бәрібір бермейміз.
+<FilesMatch "\.(jsonl|log|env)$">
+  Require all denied
+</FilesMatch>
+<IfModule mod_rewrite.c>
+  RewriteRule ^nureke-data/ - [F,L]
+</IfModule>
+
+# ── Кэш ─────────────────────────────────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+
+  # Хэші бар файлдар мәңгі кэштеледі: аты өзгермей мазмұны өзгермейді.
+  <FilesMatch "^.*\.(js|css|woff2)$">
+    ExpiresDefault "access plus 1 year"
+    Header append Cache-Control "public, immutable"
+  </FilesMatch>
+
+  # HTML — әрқашан тексеріледі, әйтпесе жаңа билд көрінбей қалады.
+  <FilesMatch "\.html$">
+    ExpiresDefault "access plus 0 seconds"
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+
+  <FilesMatch "\.(xml|txt)$">
+    ExpiresDefault "access plus 1 hour"
+  </FilesMatch>
+</IfModule>
+
+# ── Сығу ────────────────────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE application/xml image/svg+xml
+</IfModule>

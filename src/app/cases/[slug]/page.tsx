@@ -3,13 +3,21 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Section } from '@/components/section';
 import { LeadForm } from '@/components/lead-form';
-import { VISIBLE_CASES, getCase } from '@/content/cases';
+import { CASES, getCase } from '@/content/cases';
 import { DraftBadge } from '@/components/draft-badge';
 
 export const revalidate = 3600;
 
+// Статикалық экспорт: тек осы тізімдегі slug-тар бар, қалғаны 404.
+// Барлық кейс draft болса тізім бос болады — бет мүлдем жасалмайды (ADR-0003).
+export const dynamicParams = false;
+
 export function generateStaticParams() {
-  return VISIBLE_CASES.map((item) => ({ slug: item.slug }));
+  // Барлық slug-ты береміз, бірақ бұл «бәрі жарияланады» дегенді БІЛДІРМЕЙДІ:
+  // төмендегі getCase() тек VISIBLE_CASES ішінен іздейді, сондықтан заготовка
+  // notFound() арқылы сүзіліп қалады да, беті мүлдем жасалмайды (ADR-0003).
+  // Себебі: статикалық экспорт бос тізімді қабылдамайды.
+  return CASES.map((item) => ({ slug: item.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

@@ -11,7 +11,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "preview": "php -S localhost:3000 -t out"
   },
   "dependencies": {
     "@prisma/client": "^6.19.2",

@@ -34,7 +34,8 @@ export function LeadForm({ defaultProjectType = 'UNKNOWN', compact = false }: {
     };
 
     try {
-      const response = await fetch('/api/leads', {
+      // Статикалық сайт — Node route жоқ, өтінімді PHP қабылдайды (ADR-0002b).
+      const response = await fetch('/api/leads.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

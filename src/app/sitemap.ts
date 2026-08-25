@@ -3,6 +3,10 @@ import { SITE } from '@/content/site';
 import { SERVICES } from '@/content/services';
 import { INDEXABLE_CASES } from '@/content/cases';
 
+// Статикалық экспорт: билд кезінде бір рет жасалады (ADR-0002b).
+// lastModified — билд уақыты, сайт қайта жиналғанда жаңарады.
+export const dynamic = 'force-static';
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const staticRoutes = ['', '/services', '/approach', '/pricing', '/contact', ...(INDEXABLE_CASES.length > 0 ? ['/cases'] : [])].map((path) => ({

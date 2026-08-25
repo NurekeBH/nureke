@@ -41,3 +41,12 @@ generated/
 # TypeScript build cache
 *.tsbuildinfo
 next-env.d.ts
+
+# Статикалық экспорт нәтижесі (ADR-0002b) — серверге жүктеледі, репоға кірмейді
+/out/
+
+# Сервердегі құпиялар: Telegram токені осында
+/public/api/config.php
+
+# Лидтер қоймасы, егер жергілікті тексеру кезінде осында жасалып қалса
+/nureke-data/

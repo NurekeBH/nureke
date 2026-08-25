@@ -1,22 +1,21 @@
 import type { NextConfig } from 'next';
 
+/**
+ * Статикалық экспорт: хостинг PHP-only, Node процесі жүрмейді (ADR-0002b).
+ *
+ * Салдары:
+ *  — `headers()` бұл режимде жұмыс істемейді. Қауіпсіздік хедерлері
+ *    `public/.htaccess` ішіне көшірілді. Оны өзгертсең, сол жерде өзгерт.
+ *  — `/api/*` route handler жоқ. Лид формасы `public/api/leads.php`-ке кетеді.
+ *  — `revalidate` мәні ескерілмейді: мазмұн `src/content/*` ішінде,
+ *    ол билд кезінде статикаға айналады. Мазмұн өзгерсе — қайта билд.
+ */
 const nextConfig: NextConfig = {
-  output: 'standalone',
+  output: 'export',
   poweredByHeader: false,
-  compress: true,
-  async headers() {
-    return [
-      {
-        source: '/:path*',
-        headers: [
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
-        ],
-      },
-    ];
-  },
+  // Слэшсіз таза URL: sitemap мен canonical солай жазылған.
+  // Apache-та `.html`-ге айналдыруды .htaccess жасайды.
+  trailingSlash: false,
 };
 
 export default nextConfig;

@@ -10,6 +10,9 @@ import type { ProjectTypeValue } from '@/content/forms';
 
 export const revalidate = 3600;
 
+// Статикалық экспорт: тек осы тізімдегі slug-тар бар, қалғаны 404.
+export const dynamicParams = false;
+
 /** Какой тип задачи подставить в форму, чтобы клиент не выбирал вручную. */
 const FORM_DEFAULTS: Record<string, ProjectTypeValue> = {
   'ai-automation': 'AI_AUTOMATION',
