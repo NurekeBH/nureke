@@ -1,6 +1,6 @@
 export const SITE = {
-  name: 'Nureke Digital',
-  legalName: 'Nureke Digital',
+  name: 'Nureke Systems',
+  legalName: 'Nureke Systems',
   tagline: 'Digital-системы, которые приносят деньги',
   description:
     'Продуктовая студия из Казахстана. Собираем AI-автоматизацию продаж, мобильные приложения, Telegram Mini Apps и CRM — системы, которые приносят заявки и деньги, а не просто существуют в интернете.',
