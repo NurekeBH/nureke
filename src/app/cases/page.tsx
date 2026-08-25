@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Section } from '@/components/section';
-import { CASES, hasCases } from '@/content/cases';
+import { VISIBLE_CASES, hasCases } from '@/content/cases';
+import { DraftBadge } from '@/components/draft-badge';
 
 export const revalidate = 3600;
 
@@ -10,6 +11,8 @@ export const metadata: Metadata = {
   title: 'Кейсы — проекты и результаты',
   description: 'Проекты, которые мы собрали: задача клиента, решение, технологии и результат.',
   alternates: { canonical: '/cases' },
+  // Пока в списке есть заготовки, отдавать его поисковикам нельзя.
+  robots: VISIBLE_CASES.some((item) => item.draft) ? { index: false, follow: false } : undefined,
 };
 
 export default function CasesPage() {
@@ -24,12 +27,13 @@ export default function CasesPage() {
       lede="Задача клиента, что сделали, на чём и что изменилось. Без придуманных процентов."
     >
       <div className="grid gap-5 md:grid-cols-2">
-        {CASES.map((item) => (
+        {VISIBLE_CASES.map((item) => (
           <Link
             key={item.slug}
             href={`/cases/${item.slug}`}
             className="card group flex flex-col transition-colors hover:border-nur"
           >
+            {item.draft && <DraftBadge className="mb-4" />}
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
               <span className="rounded-full border border-line px-3 py-1">{item.industry}</span>
               <span className="rounded-full border border-line px-3 py-1">{item.year}</span>

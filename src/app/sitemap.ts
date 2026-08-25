@@ -1,11 +1,11 @@
 import type { MetadataRoute } from 'next';
 import { SITE } from '@/content/site';
 import { SERVICES } from '@/content/services';
-import { CASES, hasCases } from '@/content/cases';
+import { INDEXABLE_CASES } from '@/content/cases';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticRoutes = ['', '/services', '/approach', '/pricing', '/contact', ...(hasCases ? ['/cases'] : [])].map((path) => ({
+  const staticRoutes = ['', '/services', '/approach', '/pricing', '/contact', ...(INDEXABLE_CASES.length > 0 ? ['/cases'] : [])].map((path) => ({
     url: `${SITE.url}${path}`,
     lastModified: now,
     changeFrequency: 'weekly' as const,
@@ -19,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.9,
   }));
 
-  const caseRoutes = CASES.map((item) => ({
+  const caseRoutes = INDEXABLE_CASES.map((item) => ({
     url: `${SITE.url}/cases/${item.slug}`,
     lastModified: now,
     changeFrequency: 'monthly' as const,

@@ -6,6 +6,7 @@ import { FAQ, PROBLEMS, PROCESS, SITE, TECH_STACK, whatsappLink } from '@/conten
 import { SERVICES } from '@/content/services';
 import { EXPERIENCE, RISK_REVERSAL, WHY_US } from '@/content/trust';
 import { PACKAGES, DISCOVERY } from '@/content/pricing';
+import { ClientsStrip } from '@/components/clients-strip';
 
 export const revalidate = 3600;
 
@@ -60,6 +61,9 @@ export default function HomePage() {
           ))}
         </div>
       </div>
+
+      {/* 2.5 — Клиенты */}
+      <ClientsStrip />
 
       {/* 3 — Проблема */}
       <Section

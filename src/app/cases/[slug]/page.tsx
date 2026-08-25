@@ -3,12 +3,13 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Section } from '@/components/section';
 import { LeadForm } from '@/components/lead-form';
-import { CASES, getCase } from '@/content/cases';
+import { VISIBLE_CASES, getCase } from '@/content/cases';
+import { DraftBadge } from '@/components/draft-badge';
 
 export const revalidate = 3600;
 
 export function generateStaticParams() {
-  return CASES.map((item) => ({ slug: item.slug }));
+  return VISIBLE_CASES.map((item) => ({ slug: item.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -20,6 +21,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: study.seoDescription,
     alternates: { canonical: `/cases/${study.slug}` },
     openGraph: { title: study.seoTitle, description: study.seoDescription },
+    // Заготовку поисковики не увидят даже если она включена на сайте.
+    robots: study.draft ? { index: false, follow: false } : undefined,
   };
 }
 
@@ -39,6 +42,8 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
             <span aria-hidden> / </span>
             <span className="text-body">{study.client}</span>
           </nav>
+
+          {study.draft && <DraftBadge className="mt-6" />}
 
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs">
             <span className="rounded-full border border-nur/50 px-3 py-1 font-semibold text-nur">
