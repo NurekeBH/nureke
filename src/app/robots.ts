@@ -11,7 +11,11 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         // CRM и персональные ссылки на КП индексировать нельзя.
-        disallow: ['/api/', '/crm', '/crm/', '/p/'],
+        // `/_not-found` — служебный маршрут Next: копия страницы 404,
+        // которую статический экспорт всё равно кладёт файлом.
+        // `/_next/` НЕ закрываем — Google нужны CSS и JS, чтобы отрисовать
+        // страницу; без них ранжирование падает.
+        disallow: ['/api/', '/crm', '/crm/', '/p/', '/_not-found'],
       },
     ],
     sitemap: `${SITE.url}/sitemap.xml`,

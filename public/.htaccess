@@ -48,6 +48,16 @@ DirectorySlash Off
 
 ErrorDocument 404 /404.html
 
+# Next OG-суретін КЕҢЕЙТІМСІЗ файл етіп шығарады: out/opengraph-image.
+# Apache MIME-түрді кеңейтім арқылы анықтайды, сондықтан жауап мүлдем
+# Content-Type-сыз кетеді. Сайт `nosniff` қоятындықтан WhatsApp, Telegram
+# және Facebook скраперлері оны сурет деп танымайды — сілтеме жібергенде
+# алдын ала қарау бос шығады. Outbound күніне 40 хабарлама болатындықтан
+# бұл ұсақ түйін емес.
+<FilesMatch "^(opengraph|twitter)-image$">
+  ForceType image/png
+</FilesMatch>
+
 # ── Қауіпсіздік хедерлері ───────────────────────────────────────────────────
 <IfModule mod_headers.c>
   Header always set X-Content-Type-Options "nosniff"
